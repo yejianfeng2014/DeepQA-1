@@ -1,21 +1,8 @@
-# Copyright 2015 Conchylicultor. All Rights Reserved.
-# Modifications copyright (C) 2016 Carlos Segura
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
+
 
 """
-Model to predict the next sentence given an input sequence
+
+模型实现的功能是输入一个句子，预测出来一个句子
 
 """
 
@@ -27,6 +14,7 @@ from chatbot.textdata import Batch
 class ProjectionOp:
     """ Single layer perceptron
     Project input tensor on the output dimension
+
     """
     def __init__(self, shape, scope=None, dtype=None):
         """
@@ -71,6 +59,7 @@ class ProjectionOp:
 
 class Model:
     """
+     实现seq2seq 模型
     Implementation of a seq2seq model.
     Architecture:
         Encoder/decoder
@@ -92,6 +81,7 @@ class Model:
         # Placeholders
         self.encoderInputs  = None
         self.decoderInputs  = None  # Same that decoderTarget plus the <go>
+
         self.decoderTargets = None
         self.decoderWeights = None  # Adjust the learning to the target sentence size
 
@@ -112,6 +102,7 @@ class Model:
 
         # Parameters of sampled softmax (needed for attention mechanism and a large vocabulary size)
         outputProjection = None
+
         # Sampled softmax only makes sense if we sample less than vocabulary size.
         if 0 < self.args.softmaxSamples < self.textData.getVocabularySize():
             outputProjection = ProjectionOp(
@@ -141,9 +132,11 @@ class Model:
 
         # Creation of the rnn cell
         def create_rnn_cell():
+            # todo 可以改成不同的网络结构
             encoDecoCell = tf.contrib.rnn.BasicLSTMCell(  # Or GRUCell, LSTMCell(args.hiddenSize)
                 self.args.hiddenSize,
             )
+
             if not self.args.test:  # TODO: Should use a placeholder instead
                 encoDecoCell = tf.contrib.rnn.DropoutWrapper(
                     encoDecoCell,
@@ -151,17 +144,20 @@ class Model:
                     output_keep_prob=self.args.dropout
                 )
             return encoDecoCell
+
         encoDecoCell = tf.contrib.rnn.MultiRNNCell(
             [create_rnn_cell() for _ in range(self.args.numLayers)],
         )
 
         # Network input (placeholders)
-
+        # Batch size * sequence length * input dim  这个是
         with tf.name_scope('placeholder_encoder'):
-            self.encoderInputs  = [tf.placeholder(tf.int32,   [None, ]) for _ in range(self.args.maxLengthEnco)]  # Batch size * sequence length * input dim
+            self.encoderInputs  = [tf.placeholder(tf.int32,   [None, ]) for _ in range(self.args.maxLengthEnco)]
 
         with tf.name_scope('placeholder_decoder'):
-            self.decoderInputs  = [tf.placeholder(tf.int32,   [None, ], name='inputs') for _ in range(self.args.maxLengthDeco)]  # Same sentence length for input and output (Right ?)
+            self.decoderInputs  = [tf.placeholder(tf.int32,   [None, ], name='inputs') for _ in range(self.args.maxLengthDeco)]
+
+            # Same sentence length for input and output (Right ?) 根据实际情况进行调整，暂时不做处理
             self.decoderTargets = [tf.placeholder(tf.int32,   [None, ], name='targets') for _ in range(self.args.maxLengthDeco)]
             self.decoderWeights = [tf.placeholder(tf.float32, [None, ], name='weights') for _ in range(self.args.maxLengthDeco)]
 
@@ -174,12 +170,14 @@ class Model:
             encoDecoCell,
             self.textData.getVocabularySize(),
             self.textData.getVocabularySize(),  # Both encoder and decoder have the same number of class
-            embedding_size=self.args.embeddingSize,  # Dimension of each word
+            embedding_size=self.args.embeddingSize,  # Dimension of each word 每一个单词的维度
             output_projection=outputProjection.getWeights() if outputProjection else None,
-            feed_previous=bool(self.args.test)  # When we test (self.args.test), we use previous output as next input (feed_previous)
+            feed_previous=bool(self.args.test),  # When we test (self.args.test), we use previous output as next input (feed_previous)
         )
+        # y = a + b;
 
-        # TODO: When the LSTM hidden size is too big, we should project the LSTM output into a smaller space (4086 => 2046): Should speed up
+        # TODO: When the LSTM hidden size is too big,
+        #  we should project the LSTM output into a smaller space (4086 => 2046): Should speed up
         # training and reduce memory usage. Other solution, use sampling softmax
 
         # For testing only
@@ -225,7 +223,7 @@ class Model:
         feedDict = {}
         ops = None
 
-        if not self.args.test:  # Training
+        if not self.args.test:  # Training 训练过程
             for i in range(self.args.maxLengthEnco):
                 feedDict[self.encoderInputs[i]]  = batch.encoderSeqs[i]
             for i in range(self.args.maxLengthDeco):
@@ -234,7 +232,7 @@ class Model:
                 feedDict[self.decoderWeights[i]] = batch.weights[i]
 
             ops = (self.optOp, self.lossFct)
-        else:  # Testing (batchSize == 1)
+        else:  # Testing (batchSize == 1) 测试模式，batchSize =1
             for i in range(self.args.maxLengthEnco):
                 feedDict[self.encoderInputs[i]]  = batch.encoderSeqs[i]
             feedDict[self.decoderInputs[0]]  = [self.textData.goToken]

@@ -1,20 +1,8 @@
-# Copyright 2015 Conchylicultor. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
+
 
 """
-Loads the dialogue corpus, builds the vocabulary
+载入对话预料，生产词典
+
 """
 
 import numpy as np
@@ -66,13 +54,14 @@ class TextData:
         return list(TextData.availableCorpus.keys())
 
     def __init__(self, args):
-        """Load all conversations
+        """导入所有对话
         Args:
             args: parameters of the model
         """
         # Model parameters
         self.args = args
 
+         # 获取这个语料的所有对话集
         # Path variables
         self.corpusDir = os.path.join(self.args.rootDir, 'data', self.args.corpus)
         basePath = self._constructBasePath()
@@ -90,9 +79,9 @@ class TextData:
 
         self.trainingSamples = []  # 2d array containing each question and his answer [[input,target]]
 
-        self.word2id = {}
-        self.id2word = {}  # For a rapid conversion (Warning: If replace dict by list, modify the filtering to avoid linear complexity with del)
-        self.idCount = {}  # Useful to filters the words (TODO: Could replace dict by list or use collections.Counter)
+        self.word2id = {}  # 单词 id 编号表 把单词转数字使用
+        self.id2word = {}  # id  单词编号表  把数字转单词使用  For a rapid conversion (Warning: If replace dict by list, modify the filtering to avoid linear complexity with del)
+        self.idCount = {}  # Useful to filters the words  词频统计，过滤到使用率非常低的词的时候可以使用(TODO: Could replace dict by list or use collections.Counter)
 
         self.loadCorpus()
 
@@ -140,7 +129,7 @@ class TextData:
         """
 
         batch = Batch()
-        batchSize = len(samples)
+        batchSize = len(samples)  # 总的数据量
 
         # Create the batch tensor
         for i in range(batchSize):
@@ -241,6 +230,7 @@ class TextData:
 
     def loadCorpus(self):
         """Load/create the conversations data
+                下载 对话数据
         """
         datasetExist = os.path.isfile(self.filteredSamplesPath)
         if not datasetExist:  # First time we load the database: creating all files
@@ -257,6 +247,10 @@ class TextData:
                     optional = os.sep + self.args.datasetTag  # HACK: Forward the filename
 
                 # Corpus creation
+
+                # 创建语料的来源
+                print('self.args.corpus:',self.args.corpus)
+                print('self.corpusDir + optional:',self.corpusDir + optional)
                 corpusData = TextData.availableCorpus[self.args.corpus](self.corpusDir + optional)
                 self.createFullCorpus(corpusData.getConversations())
                 self.saveDataset(self.fullSamplesPath)
@@ -283,7 +277,8 @@ class TextData:
         Args:
             filename (str): pickle filename
         """
-
+        # 讲数据集保存到这个路径下
+        print('save data in this path :',os.path.join(filename))
         with open(os.path.join(filename), 'wb') as handle:
             data = {  # Warning: If adding something here, also modifying loadDataset
                 'word2id': self.word2id,
@@ -312,6 +307,7 @@ class TextData:
             self.eosToken = self.word2id['<eos>']
             self.unknownToken = self.word2id['<unknown>']  # Restore special words
 
+    # 过滤出来满足要求的语料
     def filterFromFull(self):
         """ Load the pre-processed full corpus and filter the vocabulary / sentences
         to match the given model options
@@ -522,7 +518,9 @@ class TextData:
             print('Weights: {}'.format(' '.join([str(weight) for weight in [batchWeight[i] for batchWeight in batch.weights]])))
 
     def sequence2str(self, sequence, clean=False, reverse=False):
-        """Convert a list of integer into a human readable string
+        """
+            把数字转成 字符串
+        Convert a list of integer into a human readable string
         Args:
             sequence (list<int>): the sentence to print
             clean (Bool): if set, remove the <go>, <pad> and <eos> tokens
@@ -563,7 +561,9 @@ class TextData:
             for t in tokens]).strip().capitalize()
 
     def batchSeq2str(self, batchSeq, seqId=0, **kwargs):
-        """Convert a list of integer into a human readable string.
+        """
+              讲一批数字转成字符串
+        Convert a list of integer into a human readable string.
         The difference between the previous function is that on a batch object, the values have been reorganized as
         batch instead of sentence.
         Args:
@@ -579,7 +579,9 @@ class TextData:
         return self.sequence2str(sequence, **kwargs)
 
     def sentence2enco(self, sentence):
-        """Encode a sequence and return a batch as an input for the model
+        """
+            编码一个句子转成数字
+        Encode a sequence and return a batch as an input for the model
         Return:
             Batch: a batch object containing the sentence, or none if something went wrong
         """
@@ -588,27 +590,34 @@ class TextData:
             return None
 
         # First step: Divide the sentence in token
+            # 使用nltk 的分词
+        # 如果长度大于 参数的最大长度讲返回 None
         tokens = nltk.word_tokenize(sentence)
         if len(tokens) > self.args.maxLength:
             return None
 
         # Second step: Convert the token in word ids
+        # 将每一个词，转成数字，然后组成一个数组
         wordIds = []
         for token in tokens:
             wordIds.append(self.getWordId(token, create=False))  # Create the vocabulary and the training sentences
 
         # Third step: creating the batch (add padding, reverse)
-        batch = self._createBatch([[wordIds, []]])  # Mono batch, no target output
+
+        batch = self._createBatch([[wordIds, []]])  # Mono batch, no target output 单次批处理，没有目标输出
 
         return batch
 
     def deco2sentence(self, decoderOutputs):
-        """Decode the output of the decoder and return a human friendly sentence
+        """
+        解码过程
+        Decode the output of the decoder and return a human friendly sentence
         decoderOutputs (list<np.array>):
         """
         sequence = []
 
         # Choose the words with the highest prediction score
+        # 获取单词的最高预测值
         for out in decoderOutputs:
             sequence.append(np.argmax(out))  # Adding each predicted word ids
 
