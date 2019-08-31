@@ -64,7 +64,11 @@ class TextData:
          # 获取这个语料的所有对话集
         # Path variables
         self.corpusDir = os.path.join(self.args.rootDir, 'data', self.args.corpus)
+
+        print( "语料路径：",self.corpusDir)
         basePath = self._constructBasePath()
+
+        print("根路径：" + basePath)
         self.fullSamplesPath = basePath + '.pkl'  # Full sentences length/vocab
         self.filteredSamplesPath = basePath + '-length{}-filter{}-vocabSize{}.pkl'.format(
             self.args.maxLength,
@@ -236,6 +240,7 @@ class TextData:
         if not datasetExist:  # First time we load the database: creating all files
             print('Training samples not found. Creating dataset...')
 
+            print("判断训练的数据集是否存在")
             datasetExist = os.path.isfile(self.fullSamplesPath)  # Try to construct the dataset from the preprocessed entry
             if not datasetExist:
                 print('Constructing full dataset...')
@@ -277,7 +282,7 @@ class TextData:
         Args:
             filename (str): pickle filename
         """
-        # 讲数据集保存到这个路径下
+        # 将数据集保存到这个路径下
         print('save data in this path :',os.path.join(filename))
         with open(os.path.join(filename), 'wb') as handle:
             data = {  # Warning: If adding something here, also modifying loadDataset

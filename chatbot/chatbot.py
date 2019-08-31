@@ -181,7 +181,7 @@ class Chatbot:
         """
         print('Welcome to chat v0.1 !')
         print()
-        print('TensorFlow detected: v{}'.format(tf.__version__)) # 当前tensorflow 版本1.10.0
+        print('TensorFlow detected: v{}'.format(tf.__version__)) # 当前tensorflow 版本1.10.0 ,测试服务器的版本1.13.1
 
         # General initialisation 分割参数
 
