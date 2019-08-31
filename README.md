@@ -136,6 +136,8 @@ Start training (press Ctrl+C to save and exit)...
 
 kaggle competitions download -c quora-insincere-questions-classification
 
+#由于本地的电脑系统太烂，tensorflow 根本跑不起来，所以在google 平台上跑代码。
+
 
 
 

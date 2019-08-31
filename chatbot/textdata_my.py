@@ -52,48 +52,44 @@ class TextData:
         """
         return list(TextData.availableCorpus.keys())
 
-    def __init__(self, args):
+    # def __init__(self, args):
         """导入所有对话
         Args:
             args: parameters of the model
         """
         # Model parameters
-        self.args = args
+        # self.args = args
 
         # 获取这个语料的所有对话集
         # Path variables
-        self.corpusDir = os.path.join(self.args.rootDir, 'data', self.args.corpus)
-
-        print("语料路径：", self.corpusDir)
-        basePath = self._constructBasePath()
-
-        print("根路径：" + basePath)
-        self.fullSamplesPath = basePath + '.pkl'  # Full sentences length/vocab
-        self.filteredSamplesPath = basePath + '-length{}-filter{}-vocabSize{}.pkl'.format(
-            self.args.maxLength,
-            self.args.filterVocab,
-            self.args.vocabularySize,
-        )  # Sentences/vocab filtered for this model
-
-        self.padToken = -1  # Padding
-        self.goToken = -1  # Start of sequence
-        self.eosToken = -1  # End of sequence
-        self.unknownToken = -1  # Word dropped from vocabulary
-
-        self.trainingSamples = []  # 2d array containing each question and his answer [[input,target]]
-
-        self.word2id = {}  # 单词 id 编号表 把单词转数字使用
-        self.id2word = {}  # id  单词编号表  把数字转单词使用  For a rapid conversion (Warning: If replace dict by list, modify the filtering to avoid linear complexity with del)
-        self.idCount = {}  # Useful to filters the words  词频统计，过滤到使用率非常低的词的时候可以使用(TODO: Could replace dict by list or use collections.Counter)
+        # self.corpusDir = os.path.join(self.args.rootDir, 'data', self.args.corpus)
+        #
+        # print("语料路径：", self.corpusDir)
+        # basePath = self._constructBasePath()
+        #
+        # print("根路径：" + basePath)
+        # self.fullSamplesPath = basePath + '.pkl'  # Full sentences length/vocab
+        # self.filteredSamplesPath = basePath + '-length{}-filter{}-vocabSize{}.pkl'.format(
+        #     self.args.maxLength,
+        #     self.args.filterVocab,
+        #     self.args.vocabularySize,
+        # )  # Sentences/vocab filtered for this model
+        #
+        # self.padToken = -1  # Padding
+        # self.goToken = -1  # Start of sequence
+        # self.eosToken = -1  # End of sequence
+        # self.unknownToken = -1  # Word dropped from vocabulary
+        #
+        # self.trainingSamples = []  # 2d array containing each question and his answer [[input,target]]
+        #
+        # self.word2id = {}  # 单词 id 编号表 把单词转数字使用
+        # self.id2word = {}  # id  单词编号表  把数字转单词使用  For a rapid conversion (Warning: If replace dict by list, modify the filtering to avoid linear complexity with del)
+        # self.idCount = {}  # Useful to filters the words  词频统计，过滤到使用率非常低的词的时候可以使用(TODO: Could replace dict by list or use collections.Counter)
 
         # 载入语料
-        self.loadCorpus()
+        # self.loadCorpus()
 
-        # Plot some stats:
-        self._printStats()
 
-        if self.args.playDataset:
-            self.playDataset()
 
     def _printStats(self):
         print('Loaded {}: {} words, {} QA'.format(self.args.corpus, len(self.word2id), len(self.trainingSamples)))
@@ -243,58 +239,73 @@ class TextData:
         """Load/create the conversations data
                 下载 对话数据
         """
-        datasetExist = os.path.isfile(self.filteredSamplesPath)
 
-        if not datasetExist:  # First time we load the database: creating all files
-            print('Training samples not found. Creating dataset...')
+        # print('self.args.corpus:', self.args.corpus)
+        # print('self.corpusDir + optional:', self.corpusDir + optional)
 
-            print("判断训练的数据集是否存在")
-            datasetExist = os.path.isfile(
-                self.fullSamplesPath)  # Try to construct the dataset from the preprocessed entry
+        # 载入自定义的语料
 
-            if not datasetExist:
-                print('Constructing full dataset...')
+        # corpusData = TextData.availableCorpus[self.args.corpus](self.corpusDir + optional)
+        #
+        corpusData = TextData.availableCorpus['lightweight'](self.corpusDir + optional)
 
-                optional = ''
-                if self.args.corpus == 'lightweight':
-                    if not self.args.datasetTag:
-                        raise ValueError('Use the --datasetTag to define the lightweight file to use.')
-                    optional = os.sep + self.args.datasetTag  # HACK: Forward the filename
+        self.createFullCorpus(corpusData.getConversations())
+        self.saveDataset(self.fullSamplesPath)
 
-                # Corpus creation
 
-                # 创建语料的来源
-                print('self.args.corpus:', self.args.corpus)
-                print('self.corpusDir + optional:', self.corpusDir + optional)
-
-                # 载入自定义的语料
-
-                # corpusData = TextData.availableCorpus[self.args.corpus](self.corpusDir + optional)
-                #
-                corpusData = TextData.availableCorpus['lightweight'](self.corpusDir + optional)
-
-                self.createFullCorpus(corpusData.getConversations())
-                self.saveDataset(self.fullSamplesPath)
-            else:
-                self.loadDataset(self.fullSamplesPath)
-
-            print("数据与处理好了，查看数据的各种状态>>>>>>>>>>>>>>>>>>>>>>>>>>")
-            self._printStats()
-
-            print('Filtering words (vocabSize = {} and wordCount > {})...'.format(
-                self.args.vocabularySize,
-                self.args.filterVocab
-            ))
-            self.filterFromFull()  # Extract the sub vocabulary for the given maxLength and filterVocab
-
-            # Saving
-            print('Saving dataset...')
-            print("")
-            self.saveDataset(self.filteredSamplesPath)  # Saving tf samples
-        else:
-            self.loadDataset(self.filteredSamplesPath)
-
-        assert self.padToken == 0
+        #
+        # datasetExist = os.path.isfile(self.filteredSamplesPath)
+        #
+        # if not datasetExist:  # First time we load the database: creating all files
+        #     print('Training samples not found. Creating dataset...')
+        #
+        #     print("判断训练的数据集是否存在")
+        #     datasetExist = os.path.isfile(
+        #         self.fullSamplesPath)  # Try to construct the dataset from the preprocessed entry
+        #
+        #     if not datasetExist:
+        #         print('Constructing full dataset...')
+        #
+        #         optional = ''
+        #         if self.args.corpus == 'lightweight':
+        #             if not self.args.datasetTag:
+        #                 raise ValueError('Use the --datasetTag to define the lightweight file to use.')
+        #             optional = os.sep + self.args.datasetTag  # HACK: Forward the filename
+        #
+        #         # Corpus creation
+        #
+        #         # 创建语料的来源
+        #         print('self.args.corpus:', self.args.corpus)
+        #         print('self.corpusDir + optional:', self.corpusDir + optional)
+        #
+        #         # 载入自定义的语料
+        #
+        #         # corpusData = TextData.availableCorpus[self.args.corpus](self.corpusDir + optional)
+        #         #
+        #         corpusData = TextData.availableCorpus['lightweight'](self.corpusDir + optional)
+        #
+        #         self.createFullCorpus(corpusData.getConversations())
+        #         self.saveDataset(self.fullSamplesPath)
+        #     else:
+        #         self.loadDataset(self.fullSamplesPath)
+        #
+        #     print("数据与处理好了，查看数据的各种状态>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        #     self._printStats()
+        #
+        #     print('Filtering words (vocabSize = {} and wordCount > {})...'.format(
+        #         self.args.vocabularySize,
+        #         self.args.filterVocab
+        #     ))
+        #     self.filterFromFull()  # Extract the sub vocabulary for the given maxLength and filterVocab
+        #
+        #     # Saving
+        #     print('Saving dataset...')
+        #     print("")
+        #     self.saveDataset(self.filteredSamplesPath)  # Saving tf samples
+        # else:
+        #     self.loadDataset(self.filteredSamplesPath)
+        #
+        # assert self.padToken == 0
 
     def saveDataset(self, filename):
         """Save samples to file
@@ -681,4 +692,7 @@ def tqdm_wrap(iterable, *args, **kwargs):
 
 
 if __name__ == '__main__':
-    print(1)
+    # args ={}
+    a= TextData()
+    a.loadCorpus()
+

@@ -70,9 +70,9 @@ class LightweightData:
     def getConversations(self):
         return self.conversations
 
-# myfile = 'D:/python_workspace/DeepQA/data/lightweight/mydata'
+myfile = 'D:/python_workspace/DeepQA-1/data/lightweight/mydata'
 
-# mydata = LightweightData(myfile)
+mydata = LightweightData(myfile)
 
 # mydata.loadLines()
 
