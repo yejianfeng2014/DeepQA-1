@@ -127,8 +127,8 @@ class Chatbot:
         # The samples are computed from the corpus if it does not exist already. There are saved in \'data/samples/\'
         # Not implemented, useless ? 使用这个数据集的比例，现在还没有实现这个功能
         datasetArgs.add_argument('--ratioDataset', type=float, default=1.0, help='ratio of dataset used to avoid using the whole dataset')
-        # 最大长度 默认是10 这个影响输入和输出的卷积步长
-        datasetArgs.add_argument('--maxLength', type=int, default=10, help='maximum length of the sentence (for input and output), define number of maximum step of the RNN')
+        # 最大长度 默认是10 这个影响输入和输出的卷积步长 把这个长度改为100
+        datasetArgs.add_argument('--maxLength', type=int, default=100, help='maximum length of the sentence (for input and output), define number of maximum step of the RNN')
 
         # 删除很少使用的单词（默认单词只使用一次）。 0保留所有单词。
 
