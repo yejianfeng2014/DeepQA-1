@@ -77,15 +77,15 @@ class LightweightData:
 
     def getConversations(self):
         return self.conversations
-
-myfile = 'D:/python_workspace/DeepQA-1/data/lightweight/mydata'
-
-mydata = LightweightData(myfile)
-
-conversations = mydata.getConversations()
-
-
-print(">>>>>")
+# 临时注释掉，否则会直接运行这个文件。。。。。。
+# myfile = 'D:/python_workspace/DeepQA-1/data/lightweight/mydata'
+#
+# mydata = LightweightData(myfile)
+#
+# conversations = mydata.getConversations()
+#
+#
+# print(">>>>>")
 
 # mydata.loadLines()
 
