@@ -1,3 +1,7 @@
+原始的的地址
+https://github.com/Conchylicultor/DeepQA
+
+
 https://colab.research.google.com/drive/1g3cf9T1zyXk53BjNy_UTy7dbfnnTtEoV#scrollTo=Cj8ClQMO_AyV
 !python --version  这个来自google 最新使用的python 3.6.7
 
@@ -137,6 +141,9 @@ Start training (press Ctrl+C to save and exit)...
 kaggle competitions download -c quora-insincere-questions-classification
 
 #由于本地的电脑系统太烂，tensorflow 根本跑不起来，所以在google 平台上跑代码。
+
+
+2019-9-2 把数据格式转成 电影对话的数据格式，然后直接跑起来看看。
 
 
 

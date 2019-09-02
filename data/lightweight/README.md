@@ -19,3 +19,6 @@ from F to E
 ```
 
 To use your conversation file `<name>.txt`, copy it in this repository and launch the program with the option `--corpus lightweight --datasetTag <name>`.
+
+
+`--corpus lightweight --datasetTag <name>`.

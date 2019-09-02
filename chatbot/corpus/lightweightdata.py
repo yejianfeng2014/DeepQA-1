@@ -36,6 +36,14 @@ from D to C
 
 """
 
+"""
+最终的数据格式是这样的  
+
+每一行都是一个person的语句，下一行是下一个人的回复。实际只有内容没有from  to 也没有A B 等
+
+"""
+
+
 class LightweightData:
     """
     """
@@ -73,6 +81,11 @@ class LightweightData:
 myfile = 'D:/python_workspace/DeepQA-1/data/lightweight/mydata'
 
 mydata = LightweightData(myfile)
+
+conversations = mydata.getConversations()
+
+
+print(">>>>>")
 
 # mydata.loadLines()
 

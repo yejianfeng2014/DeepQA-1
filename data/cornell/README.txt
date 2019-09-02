@@ -49,7 +49,7 @@ In all files the field separator is " +++$+++ "
 		- movie year, 
 	   	- IMDB rating,
 		- no. IMDB votes,
- 		- genres in the format ['genre1','genre2',�,'genreN']
+ 		- genres in the format ['genre1','genre2',�,'genreN']
 
 - movie_characters_metadata.txt
 	- contains information about each movie character
@@ -64,20 +64,20 @@ In all files the field separator is " +++$+++ "
 - movie_lines.txt
 	- contains the actual text of each utterance
 	- fields:
-		- lineID
-		- characterID (who uttered this phrase)
-		- movieID
-		- character name
-		- text of the utterance
+		- lineID  电影id
+		- characterID (who uttered this phrase) 角色id
+		- movieID   电影id
+		- character name  角色名
+		- text of the utterance   说出来的话
 
 - movie_conversations.txt
 	- the structure of the conversations
 	- fields
-		- characterID of the first character involved in the conversation
+		- characterID of the first character involved in the conversation # 第一个角色
 		- characterID of the second character involved in the conversation
 		- movieID of the movie in which the conversation occurred
 		- list of the utterances that make the conversation, in chronological 
-			order: ['lineID1','lineID2',�,'lineIDN']
+			order: ['lineID1','lineID2',�,'lineIDN']
 			has to be matched with movie_lines.txt to reconstruct the actual content
 
 - raw_script_urls.txt

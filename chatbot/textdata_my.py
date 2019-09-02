@@ -52,43 +52,6 @@ class TextData:
         """
         return list(TextData.availableCorpus.keys())
 
-    # def __init__(self, args):
-        """导入所有对话
-        Args:
-            args: parameters of the model
-        """
-        # Model parameters
-        # self.args = args
-
-        # 获取这个语料的所有对话集
-        # Path variables
-        # self.corpusDir = os.path.join(self.args.rootDir, 'data', self.args.corpus)
-        #
-        # print("语料路径：", self.corpusDir)
-        # basePath = self._constructBasePath()
-        #
-        # print("根路径：" + basePath)
-        # self.fullSamplesPath = basePath + '.pkl'  # Full sentences length/vocab
-        # self.filteredSamplesPath = basePath + '-length{}-filter{}-vocabSize{}.pkl'.format(
-        #     self.args.maxLength,
-        #     self.args.filterVocab,
-        #     self.args.vocabularySize,
-        # )  # Sentences/vocab filtered for this model
-        #
-        # self.padToken = -1  # Padding
-        # self.goToken = -1  # Start of sequence
-        # self.eosToken = -1  # End of sequence
-        # self.unknownToken = -1  # Word dropped from vocabulary
-        #
-        # self.trainingSamples = []  # 2d array containing each question and his answer [[input,target]]
-        #
-        # self.word2id = {}  # 单词 id 编号表 把单词转数字使用
-        # self.id2word = {}  # id  单词编号表  把数字转单词使用  For a rapid conversion (Warning: If replace dict by list, modify the filtering to avoid linear complexity with del)
-        # self.idCount = {}  # Useful to filters the words  词频统计，过滤到使用率非常低的词的时候可以使用(TODO: Could replace dict by list or use collections.Counter)
-
-        # 载入语料
-        # self.loadCorpus()
-
 
 
     def _printStats(self):
@@ -247,9 +210,23 @@ class TextData:
 
         # corpusData = TextData.availableCorpus[self.args.corpus](self.corpusDir + optional)
         #
-        corpusData = TextData.availableCorpus['lightweight'](self.corpusDir + optional)
 
-        self.createFullCorpus(corpusData.getConversations())
+        availableCorpus = collections.OrderedDict([  # OrderedDict because the first element is the default choice
+            ('cornell', CornellData),
+            ('opensubs', OpensubsData),
+            ('scotus', ScotusData),
+            ('ubuntu', UbuntuData),
+            ('lightweight', LightweightData),
+        ])
+
+        data_path= ""
+        corpusData = TextData.availableCorpus['lightweight'](data_path)
+
+        conversations = corpusData.getConversations()
+
+
+        self.createFullCorpus(conversations)
+
         self.saveDataset(self.fullSamplesPath)
 
 

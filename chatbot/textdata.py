@@ -444,7 +444,7 @@ class TextData:
         self.eosToken = self.getWordId('<eos>')  # End of sequence
         self.unknownToken = self.getWordId('<unknown>')  # Word dropped from vocabulary
 
-        # Preprocessing data
+        # Preprocessing data 抽取对话
 
         for conversation in tqdm(conversations, desc='Extract conversations'):
             self.extractConversation(conversation)

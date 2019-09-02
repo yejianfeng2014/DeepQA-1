@@ -100,7 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+## 这儿配置redis 的链接信息
 redis_url = os.environ.get('CHATBOT_REDIS_URL', 'localhost')
 CHANNEL_LAYERS = {
     "default": {
