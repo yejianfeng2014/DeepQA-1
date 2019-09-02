@@ -7,15 +7,26 @@ import sys
 import os
 
 # 路径的win 和liux 的路径不一致的错误  机器人的路径
-chatbotPath = "/".join(settings.BASE_DIR.split('\\')[:-1])
+# chatbotPath = "/".join(settings.BASE_DIR.split('\\')[:-1])
+#
+# print("path:",settings.BASE_DIR)
+# # print('test:',chatbotPath)
+# sys.path.append(chatbotPath)
+# from chatbot import chatbot
+#
+# # import chatbot
+# logger = logging.getLogger(__name__)
 
-print("path:",settings.BASE_DIR)
-# print('test:',chatbotPath)
+
+# liux 系统路径这么使用
+chatbotPath = "/".join(settings.BASE_DIR.split('/')[:-1])
 sys.path.append(chatbotPath)
 from chatbot import chatbot
 
-# import chatbot
+
 logger = logging.getLogger(__name__)
+
+
 
 
 class ChatbotManager(AppConfig):
