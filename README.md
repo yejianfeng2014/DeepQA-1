@@ -29,7 +29,7 @@ python3 -m nltk.downloader punkt   这个是必须的，在window 不运行就�
 
 ## web 模块需要安装的内容
 
-channels=1.1.6
+channels==1.1.6
 django==1.10.7
 asgi-redis==1.4.3
 
@@ -98,8 +98,6 @@ python main.py --test  --modelTag ubuntu-tf1.3 这个通过
 python main.py --test  --modelTag cornell-tf1.3 未通过
 
 
-
-
 ####  python main.py
 
 
@@ -144,6 +142,9 @@ kaggle competitions download -c quora-insincere-questions-classification
 
 
 2019-9-2 把数据格式转成 电影对话的数据格式，然后直接跑起来看看。
+
+已经跑完了，
+安装redis 查看效果
 
 
 
